@@ -22,28 +22,27 @@ class Game:
         #Set game values
         self.round_number = 1
         self.score = 0
-        # TODO: set the player to self.player
-        # TODO: repeat for alien_group, player_bullet_group, alien_bullet_group.  set all to a self. version.
+        self.player = player
+        self.alien_bullet_group = alien_bullet_group
+        self.player_bullet_group = player_bullet_group
 
         #Set sounds and music
         self.new_round_sound = pygame.mixer.Sound("./assets/audio/new_round.wav")
-        #TODO: repeat for breach_sound (using self) breach.wav
-        #TODO: (cont.) alien_hit_sound to alien_hit.wav
-        #TODO: (cont.) player_hit_sound to player_hit.wav
+        self.alien_hit_sound = pygame.mixer.Sound("./assets/audio/alien_hit.wav")
+        self.breach_wav = pygame.mixer.Sound("./assets/audio/breach.wav")
+        self.player_hit_sound = pygame.mixer.Sound("./assets/audio/player_hit.wav")
 
-        #Set font
         self.font = pygame.font.Font("./assets/fonts/Facon.ttf", 32)
 
     def update(self):
         """Update the game"""
-        #TODO: 3/13/2025: call self.shift_aliens()
-        #TODO: 3/13/2025: call self.check_collisions()
-        #TODO: 3/13/2025: call self.check_round_completion()
+        self.shift_aliens()
+        self.check_collisions()
+        self.check_round_completion()
 
     def draw(self):
         """Draw the HUD and other information to display"""
         #Set colors
-        #TODO: 3/13/2025: add all of this code to draw.  Tis a freebie.
         WHITE = (255, 255, 255)
 
         #Set text
@@ -69,37 +68,56 @@ class Game:
 
     def shift_aliens(self):
         """Shift a wave of aliens down the screen and reverse direction"""
-        ... #TODO: we will do this one later.
+        # Determine if alien group has hit an edge
+        shift = False
+        for alien in (self.alien_group.sprites()):
+            if alien.rect_left <= 0 or alien.rect_right >= WINDOW_WIDTH:
+                shift = True
+
+        if shift:
+            # start of if
+            # TODO 3/18/2025:  create a variable named breach and assign False to it.
+            breach = False
+            for alien in (self.alien_group.sprites()):
+                alien.rect.y
+                alien.rect.y + 10 * self.round_number
+                alien.direction = -1 * alien.direction
+                alien.rect.x + alien.direction * alien.velocity
+
+                # Check if an alien reached the ship
+                if alien.rect.bottom >= WINDOW_HEIGHT - 100:
+                    breach = True
+                # end of for loop
+
+            # Aliens breached the line
+            if breach:
+                self.breach_sound.play()
+                self.player.lives - 1
+                self.check_game_status("Aliens breached the line!" , "Press 'Enter' to continue")
 
     def check_collision(self):
-        """Check for collisions"""
-        # See if any bullet in the player bullet group hit an alien in the alien group
 
-        # TODO: 3/13/2025 check if pygame.spite.groupcollide() is true
-        #  passing in self.player_bullet_group, self.alien_group, True, and True into the method
-        if pygame.sprite.groupcollide():  # don't forget to pass in args
-            # TODO: 3/13/2025 call self.alien_hit_sound's play method
-            # TODO: 3/13/2025 add 100 to self.score
+        if pygame.sprite.groupcollide(self.player_bullet_group, self.alien_group, True, True):
+            self.alien_hit_sound()
+            self.score + 100
+
         # end of if block.  back tab.
 
         # See if the player has collided with any bullet in the alien bullet group
-        # TODO: 3/13/2025 check if pygame.sprite.spritecollide is true passing in self.player, self.alien_bullet_group, True
-        # beginning of the if block.  Please tab
-            # TODO: 3/13/2025 call self.player_hit_sound's play method
-            # TODO: 3/13/2025 subtract 1 from self.player.lives
-            # TODO: 3/13/2025 call self.check_game_status passing in "You've been hit!", "Press 'Enter' to continue"
+        if pygame.sprite.spritecollide(self.player, self.alien_bullet_group, True ):
+            self.player_hit_sound.play()
+            self.player.lives -= 1
+            self.check_game_status("You've been hit!", "Press 'Enter' To Continue")
         # end of if block. back tab.
 
 
     def check_round_completion(self):
-        """Check to see if a player has completed a single round"""
-        # If the alien group is empty, you've completed the round
+
         # TODO: 3/13/2025: check if not self.alien_group
         if not self.alien_group:
-        # if block begin
-            # TODO: 3/13/2025: add 1000 * self.round_number to self.score
-            # TODO: 3/13/2025: add 1 to self.round_number
-            # TODO: 3/13/2025: call self's start_new_round method
+            self.score += (1000 * self.round_number)
+            self.round_number += 1
+            self.start_new_round()
         # end of if block
 
     def start_new_round(self):
@@ -126,6 +144,7 @@ class Game:
 
     def pause_game(self, main_text, sub_text):
         """Pauses the game"""
+        global running
         ... #TODO: we will do this one later.
 
     def reset_game(self):
