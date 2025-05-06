@@ -122,66 +122,101 @@ class Game:
 
     def start_new_round(self):
         """Start a new round"""
-        ... #TODO: we will do this one later.
+
+    for i in range(11):
+        for j in range(5):
+            x = 64 + i * 64  # start_offset + column * column_spacing
+            y = 64 + j * 64  # start_offset + row * row_spacing
+            #velocity = self.round_number
+            #group = self.alien_bullet_group
+            #alien = alien(x, y, velocity, group)
 
     def check_game_status(self, main_text, sub_text):
         """Check to see the status of the game and how the player died"""
-        #Empty the bullet groups and reset player and remaining aliens
-        # TODO: 3/13/2025: call self.alien_bullet_group's empty method
-        # TODO: 3/13/2025: call self.player_bullet_group's empty method
-        # TODO: 3/13/2025: call self.player's reset method
+        self.alien_bullet_group.empty()
+        self.player_bullet_group.empty()
+        self.player.reset()
         for alien in self.alien_group:
+            self.alien.reset()
         # inside the for loop
             # TODO: 3/13/2025: call alien's reset method
         # done with the for loop
-
-        #Check if the game is over or if it is a simple round reset
-        # TODO: 3/13/2025: if else statement here
-        # check if self.player.lives is equal to 0.  Hint Hint == operator
-            # when the condition is true call self.reset_game()
-        # else
-            # when the condition is false (else) call self.pause_game(main_text, sub_text)
+        if self.player.lives == 0:
+            self.reset_game()
+        else:
+            self.pause_game(main_text, sub_text)
 
     def pause_game(self, main_text, sub_text):
         """Pauses the game"""
         global running
-        ... #TODO: we will do this one later.
+        BLACK = (0, 0,0)
+        WHITE = (255, 255, 255)
+
+        # Create main pause text
+        main_text = self.font.render( True, WHITE)
+        main_rect = main_text.get_rect()
+        main_rect.centerx = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
+        # Create sub pause text
+        sub_text = self.font.render( True, WHITE)
+        sub_rect = sub_text.get_rect()
+        sub_rect = (WINDOW_WIDTH//2 , WINDOW_HEIGHT + 64 , )
+
+        # Blit the pause text
+        display_surface.fill(BLACK)
+        display_surface.blit(main_text, main_rect)
+        display_surface.blit(sub_text, sub_rect)
+        pygame.display.update()
+
+        # Pause the game until the user hits enter
+        is_paused = True
+        while is_paused:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.type == pygame.K_RETURN:
+                        is_paused = False
+
+
+        # The user wants to quit
+        if event.type == pygame.QUIT:
+            is_paused = False
+            running = False
+        # start of if
+
 
     def reset_game(self):
         """Reset the game"""
-        # TODO: 3/13/2025: call self.pause_game passing in "Final Score: " + str(self.score)
+        self.pause_game("Final Score: " + str(self.score), "Press 'Enter' to play again")
         #  and "Press 'Enter' to play again"
 
         #Reset game values
-        # TODO: 3/13/2025: set the following self variables
-        # TODO: 3/13/2025: score to 0, round_number to 1, player.lives to 5
+        score = 0
+        round_number = 1
+        player_lives = 5
 
         #Empty groups
-        # TODO: 3/13/2025: call the following self methods
-        # TODO: 3/13/2025: alien_group.empty, alien_bullet_group.empty, player_bullet_group.empty
+        self.alien_group.empty()
+        self.alien_bullet_group.empty()
+        self.player_bullet_group.empty()
 
         #Start a new game
-        # TODO: 3/13/2025: call self's start_new_round method
         self.start_new_round()
 
 
 class Player(pygame.sprite.Sprite):
     """A class to model a spaceship the user can control"""
-
     def __init__(self, bullet_group):
         """Initialize the player"""
         super().__init__()
-        # TODO: (3/11/2025) assign to self.image the image loaded from "player_ship.png"
-        # TODO: (3/11/2025) assign to self.rect the rect from the image
-        # TODO: (3/11/2025) assign to self.rect.centerx the value of half of the WINDOW_WIDTH use //
-        # TODO: (3/11/2025) assign to self.rect.bottom the WINDOW_HEIGHT
+        self.image = pygame.image.load("player_ship.png")
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WINDOW_WIDTH // 2
+        self.rect.bottom = WINDOW_HEIGHT
 
-        # TODO: (3/11/2025) assign to self.lives the value of 5
-        # TODO: (3/11/2025) assign to self.velocity the value 8
+        self.lives = 5
+        self.velocity = 8
 
-        # TODO: (3/11/2025) assign self.bullet_group appropriately
-
-        # TODO: (3/11/2025) assign to self.shoot_sound the sound loaded from player_fire.wav
+        bullet_group.add(self)
+        self.shoot_sound = pygame.mixer.Sound("./assets/audio/player_fire.wav")
 
     def update(self):
         """Update the player"""
@@ -189,14 +224,18 @@ class Player(pygame.sprite.Sprite):
 
         #Move the player within the bounds of the screen
         if keys[pygame.K_LEFT] and self.rect.left > 0:
-            # TODO: (3/11/2025) subtract self.velocity from self.rect.x
-        # TODO: (3/11/2025) handle pressing K_RIGHT similarly to K_LEFT
+            self.rect.x - self.velocity
+        if keys[pygame.K_RIGHT] and self.rect.right > 0:
+            self.rect.x - self.velocity
 
     def fire(self):
         """Fire a bullet"""
         #Restrict the number of bullets on screen at a time
         if len(self.bullet_group) < 2:
+            self.shoot_sound.play()
+            PlayerBullet
             # TODO: (3/11/2025) call self.shoot_sound's play method.
+
             # TODO: (3/11/2025) create  PlayerBullet passing in self.rect.centerx, self.rect.top, self.bullet_group
 
     def reset(self):
