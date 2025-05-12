@@ -1,4 +1,5 @@
 import pygame, random
+from pygame.examples.sprite_texture import sprite
 
 #Intialize pygame
 pygame.init()
@@ -299,22 +300,16 @@ class PlayerBullet(pygame.sprite.Sprite):
         # TODO: (3/11/2025) assign 10 to self.velocity
         self.velocity = 10
         # TODO: (3/11/2025) call bullet_group's add method and pass in self.
+        self.bullet_group.add()
 
-    def __init__(self, x, y, bullet_group):
-        """Initialize the bullet"""
-        super().__init__()
-        self.image = pygame.image.load("./assets/images/green_laser.png")
-        self.rect = self.image.get_rect()
-        # TODO: (3/11/2025) assign x to self.rect.centerx
-        # TODO: (3/11/2025) do the same for centery
-
-        # TODO: (3/11/2025) assign 10 to self.velocity
-        # TODO: (3/11/2025) call bullet_group's add method and pass in self.
 
     def update(self):
         """Update the bullet"""
         # TODO: (3/11/2025) subtract self.velocity from self.rect.y:
+        self.rect.y - self.velocity
         # TODO: (3/11/2025) check if self.rect.bottom is less than 0.
+        if self.rect.bottom < 0:
+            self.kill()
             # TODO: (3/11/2025) the if block will then kill the sprite.
 
 
@@ -328,14 +323,19 @@ class AlienBullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         #TODO: (3/11/2025) assign x to self.rect.centerx
+        self.rect.centerx = x
         #TODO: (3/11/2025) do the same for centery
+        self.rect.centery = y
 
         #TODO: (3/11/2025) assign 10 to self.velocity
+        self.velocity = 10
         #TODO: (3/11/2025) call bullet_group's add method and pass in self.
+        self.bullet_group.add()
 
     def update(self):
         """Update the bullet"""
          #TODO: (3/11/2025) add self.velocity to self.rect.y:  Hint Hint:  +=
+        self.rect.y += self.velocity
 
         if self.rect.top > WINDOW_HEIGHT:
             self.kill()
@@ -346,6 +346,7 @@ class AlienBullet(pygame.sprite.Sprite):
 #Create bullet groups
 my_player_bullet_group = pygame.sprite.Group()
 #TODO: repeat for my_alien_bullet_group
+my_alien_bullet_group = pygame.sprite.Group()
 
 #Create a player group and Player object
 my_player_group = pygame.sprite.Group()
@@ -354,6 +355,8 @@ my_player_group.add(my_player)
 
 #Create an alien group.  Will add Alien objects via the game's start new round method
 #TODO: create my_alien_group
+my_alien_group = pygame.sprite.Group()
+
 
 #Create the Game object
 my_game = Game(my_player, my_alien_group, my_player_bullet_group, my_alien_bullet_group)
